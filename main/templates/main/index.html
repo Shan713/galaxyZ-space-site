@@ -111,9 +111,94 @@
     flex: 0 0 100%;
   }
 }
+  .flyer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 250ms ease;
+  }
+  .flyer-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
+  .flyer-modal {
+    width: min(920px, 92%);
+    max-height: 90vh;
+    background: #0b0b0d;
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.6);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+  }
 
+  .flyer-img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    max-height: 74vh;
+  }
+
+  /* Register button centered below flyer */
+  .flyer-actions {
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn-register {
+    padding: 12px 24px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: linear-gradient(90deg,#6d28d9,#8b5cf6,#a78bfa);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(139,92,246,0.5);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn-register:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(139,92,246,0.7);
+  }
+
+  /* Top-right X */
+  .flyer-close-x {
+    position: absolute;
+    right: 10px;
+    top: 8px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    transition: background 0.2s;
+  }
+  .flyer-close-x:hover {
+    background: rgba(255,255,255,0.2);
+  }
 </style>
+
+
 </head>
 <body>
     <div class="space-background">
@@ -151,7 +236,19 @@
         {% endif %}
     </ul>
 </nav>
-    
+    <!-- Flyer modal (static image) -->
+    <div id="flyerOverlay" class="flyer-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="flyer-modal" role="document">
+        <button id="flyerCloseX" class="flyer-close-x" aria-label="Close flyer">&times;</button>
+
+        <img class="flyer-img" alt="GalaxyZ Space Flyer" src="{% static 'assets/flyer.jpg' %}" loading="lazy"/>
+
+        <div class="flyer-actions">
+        <a href="https://forms.gle/NbJHr7x8X2E16UEV6" class="btn-register" target="_blank" rel="noopener noreferrer" id="flyerRegisterBtn">🚀 Register Now</a>
+        </div>
+    </div>
+    </div>
+
     <main>
         <section class="hero">
             <div class="hero-content">
@@ -716,5 +813,39 @@ window.addEventListener("resize", () => {
       updateCourseSlider();
     }
   }
-</script>
+</script><script>
+  (function() {
+    const overlay = document.getElementById('flyerOverlay');
+    const closeX = document.getElementById('flyerCloseX');
+    const registerBtn = document.getElementById('flyerRegisterBtn');
 
+    function openFlyer() {
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeFlyer() {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    }
+
+    closeX.addEventListener('click', closeFlyer);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeFlyer();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) closeFlyer();
+    });
+    registerBtn.addEventListener('click', () => {
+      closeFlyer();
+    });
+
+    window.addEventListener('DOMContentLoaded', openFlyer);
+  })();
+</script>

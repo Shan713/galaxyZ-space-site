@@ -8,13 +8,13 @@ import environ
 # Initialize environment variables
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
-    DEBUG=(bool, False)
+    DEBUG=(bool, True)
 )
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY
 SECRET_KEY = env("SECRET_KEY", default="unsafe-default-secret-key")
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = env.bool("DEBUG", default=True)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
 # APPLICATIONS
@@ -109,15 +109,35 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # EMAIL CONFIG
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
-EMAIL_PORT = env.int("EMAIL_PORT", default=587)
-EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
-EMAIL_SUBJECT_PREFIX = "[GalaxyZ Space] "
-EMAIL_TIMEOUT = 20
+if DEBUG:
+    # Development: use console backend (prints emails to terminal)
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+    # Dummy/fallback values so Django won't error if vars are missing
+    EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+    EMAIL_PORT = env.int("EMAIL_PORT", default=1025)
+    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+    EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="dev@example.com")
+    EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+    DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="dev@example.com")
+    EMAIL_SUBJECT_PREFIX = env("EMAIL_SUBJECT_PREFIX", default="[GalaxyZ Space (dev)] ")
+    EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=20)
+
+else:
+    # Production: require real SMTP credentials
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+    EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+
+    # 🚨 these must exist in .env in production
+    EMAIL_HOST_USER = env("EMAIL_HOST_USER", default=None)
+    EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default=None)
+
+    DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
+    EMAIL_SUBJECT_PREFIX = env("EMAIL_SUBJECT_PREFIX", default="[GalaxyZ Space] ")
+    EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=20)
+
 
 # RAZORPAY CREDENTIALS (optional)
 RAZORPAY_KEY_ID = env("RAZORPAY_KEY_ID", default="")
