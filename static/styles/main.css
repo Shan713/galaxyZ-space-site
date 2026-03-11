@@ -169,7 +169,7 @@ p {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.35rem clamp(0.5rem, 2vw, 1rem);
+    padding: 0.6rem clamp(0.5rem, 3vw, 1.2rem);
     background-color: rgba(11, 14, 63, 0.8);
     backdrop-filter: blur(10px);
     position: fixed;
@@ -180,7 +180,7 @@ p {
 }
 
 .navbar.scrolled {
-    padding: 0.25rem clamp(0.5rem, 2vw, 1rem);
+    padding: 0.4rem clamp(0.5rem, 3vw, 1.2rem);
     background-color: rgba(11, 14, 63, 0.95);
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
@@ -197,15 +197,15 @@ p {
 }
 
 .logo-img {
-    height: 28px;
+    height: 36px; /* Smaller logo */
     width: auto;
-    max-width: 100px;
+    max-width: 120px;
     transition: transform 0.3s ease;
 }
 .logo-img.rectangular {
-    height: 22px;
+    height: 28px;
     width: auto;
-    max-width: 80px;
+    max-width: 100px;
 }
 
 .nav-links {
